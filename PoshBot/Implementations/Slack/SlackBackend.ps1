@@ -6,6 +6,7 @@ class SlackBackend : Backend {
     # All othere will be ignored
     [string[]]$MessageTypes = @(
         'channel_rename'
+        'emoji_changed'
         'member_joined_channel'
         'member_left_channel'
         'message'
@@ -219,6 +220,9 @@ class SlackBackend : Backend {
                         'channel_rename' {
                             $msg.Type = [MessageType]::ChannelRenamed
                         }
+                        'emoji_changed' {
+                            $msg.Type = [MessageType]::EmojiChanged
+                        }
                         'member_joined_channel' {
                             $msg.Type = [MessageType]::Message
                             $msg.SubType = [MessageSubtype]::ChannelJoined
@@ -267,21 +271,35 @@ class SlackBackend : Backend {
                     }
 
                     if ($slackMessage.subtype) {
-                        switch ($slackMessage.subtype) {
-                            'channel_join' {
-                                $msg.Subtype = [MessageSubtype]::ChannelJoined
+                        if($msg.Type -eq [MessageType]::EmojiChanged) {
+                            switch ($slackMessage.subtype) {
+                                'add' {
+                                    $msg.Subtype = [EmojiChangedSubtype]::EmojiAdded
+                                }
+                                'remove' {
+                                    $msg.Subtype = [EmojiChangedSubtype]::EmojiRemoved
+                                }
+                                'rename' {
+                                    $msg.Subtype = [EmojiChangedSubtype]::EmojiRenamed
+                                }
                             }
-                            'channel_leave' {
-                                $msg.Subtype = [MessageSubtype]::ChannelLeft
-                            }
-                            'channel_name' {
-                                $msg.Subtype = [MessageSubtype]::ChannelRenamed
-                            }
-                            'channel_purpose' {
-                                $msg.Subtype = [MessageSubtype]::ChannelPurposeChanged
-                            }
-                            'channel_topic' {
-                                $msg.Subtype = [MessageSubtype]::ChannelTopicChanged
+                        } else {
+                            switch ($slackMessage.subtype) {
+                                'channel_join' {
+                                    $msg.Subtype = [MessageSubtype]::ChannelJoined
+                                }
+                                'channel_leave' {
+                                    $msg.Subtype = [MessageSubtype]::ChannelLeft
+                                }
+                                'channel_name' {
+                                    $msg.Subtype = [MessageSubtype]::ChannelRenamed
+                                }
+                                'channel_purpose' {
+                                    $msg.Subtype = [MessageSubtype]::ChannelPurposeChanged
+                                }
+                                'channel_topic' {
+                                    $msg.Subtype = [MessageSubtype]::ChannelTopicChanged
+                                }
                             }
                         }
                     }

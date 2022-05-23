@@ -64,6 +64,7 @@ enum ApprovalState {
 enum MessageType {
     CardClicked
     ChannelRenamed
+    EmojiChanged
     Message
     PinAdded
     PinRemoved
@@ -72,6 +73,12 @@ enum MessageType {
     ReactionRemoved
     StarAdded
     StarRemoved
+}
+
+enum EmojiChangedSubtype {
+    EmojiAdded
+    EmojiRemoved
+    EmojiRenamed
 }
 
 enum MessageSubtype {
